@@ -13,7 +13,7 @@ services:
     network_mode: host
     working_dir: /home/user/SG-Nav
     environment:
-      - DISPLAY=${DISPLAY}
+      - DISPLAY=:50
     # If you want to access GPU, please uncomment the lines below.
     # Reference : https://docs.docker.com/compose/gpu-support/
     deploy:
