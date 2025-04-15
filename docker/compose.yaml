@@ -1,0 +1,36 @@
+version: '3'
+services:
+  sg-nav:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: yuzhong1214/sg-nav:latest
+    container_name: sg-nav
+    stdin_open: true
+    tty: true
+    privileged: true
+    command: /bin/bash
+    network_mode: host
+    working_dir: /home/user/SG-Nav
+    environment:
+      - DISPLAY=${DISPLAY}
+    # If you want to access GPU, please uncomment the lines below.
+    # Reference : https://docs.docker.com/compose/gpu-support/
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [ gpu ]
+    volumes:
+      # Mount local timezone into container. ( Readonly )
+      # Reference: https://stackoverflow.com/questions/57607381/how-do-i-change-timezone-in-a-docker-container
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+      # Mount X11 server
+      - /tmp/.X11-unix:/tmp/.X11-unix
+      # Mount devices.
+      - /dev:/dev
+      # Mount workspace
+      - ..:/home/user/SG-Nav
