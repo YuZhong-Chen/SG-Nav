@@ -15,7 +15,7 @@ from PIL import Image
 from sklearn.cluster import DBSCAN
 
 from segment_anything import SamAutomaticMaskGenerator, SamPredictor, sam_model_registry
-from GroundingDINO.groundingdino.datasets import transforms as T
+from groundingdino.datasets import transforms as T
 
 from utils.utils_scenegraph.mapping import compute_spatial_similarities, merge_detections_to_objects
 from utils.utils_scenegraph.slam_classes import MapObjectList
@@ -160,10 +160,15 @@ class SceneGraph():
         self.is_navigation = is_navigation
         self.llm_name = 'llama3.2-vision'
         self.vlm_name = 'llama3.2-vision'
+        USE_REMOTE_SERVER=False
+        if USE_REMOTE_SERVER:
+            self.ollama_client = ollama.Client(host="http://violin.cs.nthu.edu.tw:11434")
+        else:
+            self.ollama_client = ollama.Client(host="http://localhost:11434")
         self.seg_xyxy = None
         self.seg_caption = None
         
-        self.groundingdino_config_file = 'GroundingDINO/groundingdino/config/GroundingDINO_SwinT_OGC.py'
+        self.groundingdino_config_file = 'docker/GroundingDINO/groundingdino/config/GroundingDINO_SwinT_OGC.py'
         self.groundingdino_checkpoint = 'data/models/groundingdino_swint_ogc.pth'
         self.sam_version = 'vit_h'
         self.sam_checkpoint = 'data/models/sam_vit_h_4b8939.pth'
@@ -757,7 +762,7 @@ Object pair(s):
             self.update_edge()
     
     def get_llm_response(self, prompt):
-        response = ollama.chat(
+        response = self.ollama_client.chat(
             model=self.llm_name,
             messages=[{
                 'role': 'user',
@@ -771,7 +776,7 @@ Object pair(s):
         image.save(buffered, format='PNG')
         image_bytes = base64.b64encode(buffered.getvalue())
         image_str = str(image_bytes, 'utf-8')
-        response = ollama.chat(
+        response = self.ollama_client.chat(
             model=self.vlm_name,
             messages=[{
                 'role': 'user',
