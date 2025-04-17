@@ -837,6 +837,10 @@ class SG_Nav_Agent():
             visualize_image = visualize_image[:, :, ::-1]
             self.visualize_image_list.append(visualize_image)
 
+            # Visualize
+            cv2.imshow("visualize", visualize_image)
+            cv2.waitKey(1)
+
     def save_video(self):
         save_video_dir = os.path.join(self.visualization_dir, 'video')
         save_video_path = f'{save_video_dir}/vid_{self.count_episodes:06d}.mp4'
